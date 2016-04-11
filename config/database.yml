@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  username: shine
+  password: shine
+  host: localhost
+
+development:
+  <<: *default
+  database: shine_development
+
+test:
+  <<: *default
+  database: shine_test
+
+production:
+  <<: *default
+  database: shine_production
+  username: shine
+  password: <%= ENV['SHINE_DATABASE_PASSWORD'] %>
