@@ -7,12 +7,13 @@ app.controller("CustomerSearchController", ["$scope", "$http",
 		$scope.customers = [];
 		$scope.search = function(searchTerm) {
 			$http.get("/customers.json",
-				{ "params": { "keywords": searchTerm, "page": page } }
-			).then(function(response) {
-				$scope.customers = response.data;
-			},function(response) {
-				alert("There was a problem: " + response.status);
-			}
+					{ "params": { "keywords": searchTerm, "page": page } }
+				).then(function(response) {
+					$scope.customers = response.data;
+					$scope.totalCustomers = response.data.length;
+				},function(response) {
+					alert("There was a problem: " + response.status);
+				}
 			);
 		}
 
@@ -24,8 +25,10 @@ app.controller("CustomerSearchController", ["$scope", "$http",
 		}
 
 		$scope.nextPage = function() {
-			page = page + 1;
-			$scope.search($scope.keywords);
+			if ($scope.totalCustomers < 10) {} else {
+				page = page + 1;
+				$scope.search($scope.keywords);
+			}
 		}	
 	}
 ]);

@@ -13,19 +13,17 @@
 					ng-model="keywords">
 				<span class="input-group-btn">
 					<button class="btn btn-primary btn-lg"
+						type="submit"
 						ng-click="search(keywords)">
 						Find Customers
 					</button>
 				</span>
 			</div>
 		</form>
-		<h1 class="searchedFor" ng-if="searchedFor">
-			<small>Searched for:</small> {{searchedFor}}
-		</h1>
 	</section>
 	<section class="search-results">
 		<header>
-			<h1 class="h3">Results (<%= @allcustomers ? @allcustomers : "0" %>)</h1>
+			<h1 class="h3">Results</h1>
 		</header>
 		<%= render partial: "pager", locals: { keywords: @keywords, page: @page } %>
 		<ol class="list-group">
