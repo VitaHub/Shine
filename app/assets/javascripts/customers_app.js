@@ -17,6 +17,11 @@ app.controller("CustomerSearchController", ["$scope", "$http",
 			);
 		}
 
+		$scope.newSearch = function(searchTerm) {
+			page = 0;
+			$scope.search(searchTerm);
+		}
+
 		$scope.previousPage = function() {
 			if (page > 0) {
 				page = page - 1;
