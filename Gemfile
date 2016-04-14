@@ -11,11 +11,15 @@ gem 'sdoc', 		'~> 0.4.0', group: :doc
 gem 'devise'
 gem 'bower-rails'
 gem 'faker'
-gem 'rspec-rails',	'~> 3.0'
  
 
 group :development, :test do
   gem 'byebug'
+  gem 'rspec-rails',	'~> 3.0'
+  # START_HIGHLIGHT
+  gem 'poltergeist'
+  # END_HIGHLIGHT
+  gem 'database_cleaner'
 end
 
 group :development do
