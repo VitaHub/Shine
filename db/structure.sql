@@ -2,12 +2,16 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.5.2
+-- Dumped by pg_dump version 9.5.2
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -25,12 +29,28 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 SET search_path = public, pg_catalog;
 
+--
+-- Name: refresh_customer_details(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION refresh_customer_details() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+      BEGIN
+        REFRESH MATERIALIZED VIEW CONCURRENTLY customer_details;
+        RETURN NULL;
+      EXCEPTION
+        WHEN feature_not_supported THEN
+          RETURN NULL;
+      END $$;
+
+
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
--- Name: addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: addresses; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE addresses (
@@ -62,7 +82,7 @@ ALTER SEQUENCE addresses_id_seq OWNED BY addresses.id;
 
 
 --
--- Name: customers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customers; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customers (
@@ -77,7 +97,7 @@ CREATE TABLE customers (
 
 
 --
--- Name: customers_billing_addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_billing_addresses; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customers_billing_addresses (
@@ -88,7 +108,7 @@ CREATE TABLE customers_billing_addresses (
 
 
 --
--- Name: customers_shipping_addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_shipping_addresses; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE customers_shipping_addresses (
@@ -100,7 +120,7 @@ CREATE TABLE customers_shipping_addresses (
 
 
 --
--- Name: states; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: states; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE states (
@@ -111,7 +131,7 @@ CREATE TABLE states (
 
 
 --
--- Name: customer_details; Type: MATERIALIZED VIEW; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_details; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
 
 CREATE MATERIALIZED VIEW customer_details AS
@@ -199,7 +219,7 @@ ALTER SEQUENCE customers_shipping_addresses_id_seq OWNED BY customers_shipping_a
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schema_migrations (
@@ -227,7 +247,7 @@ ALTER SEQUENCE states_id_seq OWNED BY states.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE users (
@@ -310,7 +330,7 @@ ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regcl
 
 
 --
--- Name: addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY addresses
@@ -318,7 +338,7 @@ ALTER TABLE ONLY addresses
 
 
 --
--- Name: customers_billing_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_billing_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customers_billing_addresses
@@ -326,7 +346,7 @@ ALTER TABLE ONLY customers_billing_addresses
 
 
 --
--- Name: customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customers
@@ -334,7 +354,7 @@ ALTER TABLE ONLY customers
 
 
 --
--- Name: customers_shipping_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_shipping_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY customers_shipping_addresses
@@ -342,7 +362,7 @@ ALTER TABLE ONLY customers_shipping_addresses
 
 
 --
--- Name: states_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: states_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY states
@@ -350,7 +370,7 @@ ALTER TABLE ONLY states
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -358,73 +378,101 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: customer_details_customer_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: customer_details_customer_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX customer_details_customer_id ON customer_details USING btree (customer_id);
 
 
 --
--- Name: customers_lower_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_lower_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX customers_lower_email ON customers USING btree (lower((email)::text));
 
 
 --
--- Name: customers_lower_first_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_lower_first_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX customers_lower_first_name ON customers USING btree (lower((first_name)::text) varchar_pattern_ops);
 
 
 --
--- Name: customers_lower_last_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: customers_lower_last_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX customers_lower_last_name ON customers USING btree (lower((last_name)::text) varchar_pattern_ops);
 
 
 --
--- Name: index_customers_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customers_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_customers_on_email ON customers USING btree (email);
 
 
 --
--- Name: index_customers_on_username; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_customers_on_username; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_customers_on_username ON customers USING btree (username);
 
 
 --
--- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_email ON users USING btree (email);
 
 
 --
--- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_reset_password_token ON users USING btree (reset_password_token);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --
+-- Name: refresh_customer_details; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER refresh_customer_details AFTER INSERT OR DELETE OR UPDATE ON customers FOR EACH STATEMENT EXECUTE PROCEDURE refresh_customer_details();
+
+
+--
+-- Name: refresh_customer_details; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER refresh_customer_details AFTER INSERT OR DELETE OR UPDATE ON customers_shipping_addresses FOR EACH STATEMENT EXECUTE PROCEDURE refresh_customer_details();
+
+
+--
+-- Name: refresh_customer_details; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER refresh_customer_details AFTER INSERT OR DELETE OR UPDATE ON customers_billing_addresses FOR EACH STATEMENT EXECUTE PROCEDURE refresh_customer_details();
+
+
+--
+-- Name: refresh_customer_details; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER refresh_customer_details AFTER INSERT OR DELETE OR UPDATE ON addresses FOR EACH STATEMENT EXECUTE PROCEDURE refresh_customer_details();
+
+
+--
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('20160411125156');
 
@@ -437,4 +485,6 @@ INSERT INTO schema_migrations (version) VALUES ('20160412175532');
 INSERT INTO schema_migrations (version) VALUES ('20160418141818');
 
 INSERT INTO schema_migrations (version) VALUES ('20160428172036');
+
+INSERT INTO schema_migrations (version) VALUES ('20160428222820');
 
