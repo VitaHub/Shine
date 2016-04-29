@@ -1,4 +1,10 @@
-var app = angular.module('customers',['ngRoute', 'templates']);
+var app = angular.module(
+	'customers',
+	[
+		'ngRoute',
+		'ngResource',
+		'templates'
+	]);
 
 app.config(["$routeProvider",
 	function($routeProvider) {
@@ -12,18 +18,11 @@ app.config(["$routeProvider",
 	}
 ]);
 
-app.controller("CustomerDetailController", ["$scope", "$http", "$routeParams", function($scope, $http, $routeParams) {
+app.controller("CustomerDetailController", ["$scope", "$resource", "$routeParams", function($scope, $resource, $routeParams) {
 
-var customerId = $routeParams.id;
-	$scope.customer = {};
-	$http.get(
-			"/customers/" + customerId + ".json"
-	).then(function(response) {
-			$scope.customer = response.data;
-		},function(response) {
-			alert("There was a problem: " + response.status);
-		}
-	);
+	var customerId = $routeParams.id;
+	var Customer = $resource('/customers/:customerId.json');
+	$scope.customer = Customer.get({"customerId": customerId});
 
 }]);
 
