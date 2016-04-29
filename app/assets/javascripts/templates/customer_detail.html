@@ -89,23 +89,25 @@
 				<header class="panel-heading">
 					<h1 class="h4">Billing Info</h1>
 				</header>
-				<section class="panel-body"><article>
-					<div class="row">
-						<div class="col-md-7">
-							<p class="h4">
-								****-****-****-1234
-								<span class="label label-success">VISA</span>
-							</p>
-							<p class="h5">
-								<label>Expires:</label> 04/19
-							</p>
+				<section class="panel-body">
+					<article ng-controller="CustomerCreditCardController">
+						<div class="row">
+							<div class="col-md-7">
+								<p class="h4">
+									****-****-****-{{creditCard.lastFour}}
+									<span class="label label-success">{{creditCard.cardType | uppercase}}</span>
+								</p>
+								<p class="h5">
+									<label>Expires:</label> {{creditCard.expirationMonth}}/{{creditCard.expirationYear | limitTo : 2 : 2 }}
+								</p>
+							</div>
+							<div class="col-md-5 text-right">
+								<a href="{{creditCard.detailsLink}}" class="btn btn-lg btn-default">
+								View details...
+								</a>
+							</div>
 						</div>
-						<div class="col-md-5 text-right">
-							<button class="btn btn-lg btn-default">
-							View details...
-							</button>
-						</div>
-					</div></article>
+					</article>
 					<hr>
 					<article class="well well-sm">
 						<header>
